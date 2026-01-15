@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoções Corporativas: O Jogo da Decisão</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(to right, #303f9f, #3f51b5);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-bottom: 5px solid #5c6bc0;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            min-height: 600px;
+            padding: 30px;
+        }
+
+        .phase {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .phase.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .scenario-box {
+            background: #f5f5f5;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-left: 6px solid #3f51b5;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .scenario-title {
+            color: #303f9f;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .scenario-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #444;
+        }
+
+        .emotions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .emotion-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .emotion-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .emotion-card.selected {
+            border-color: #3f51b5;
+            background-color: #e8eaf6;
+            transform: scale(1.03);
+        }
+
+        .emotion-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            height: 60px;
+            width: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+
+        .emotion-name {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: #303f9f;
+        }
+
+        .emotion-description {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            gap: 15px;
+        }
+
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, #3f51b5, #5c6bc0);
+            color: white;
+            box-shadow: 0 5px 15px rgba(63, 81, 181, 0.4);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(to right, #3949ab, #303f9f);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(63, 81, 181, 0.6);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #555;
+        }
+
+        .btn-secondary:hover {
+            background: #d5d5d5;
+            transform: translateY(-3px);
+        }
+
+        .btn-icon {
+            font-size: 1.3rem;
+        }
+
+        .results {
+            background: #f9f9f9;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            border-top: 5px solid #4caf50;
+        }
+
+        .results-title {
+            color: #388e3c;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .result-emotion {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .result-emotion-name {
+            font-weight: bold;
+            font-size: 1.3rem;
+            color: #333;
+        }
+
+        .result-impact {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #555;
+        }
+
+        .result-impact strong {
+            color: #d32f2f;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            margin: 30px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #4caf50, #8bc34a);
+            width: 0%;
+            transition: width 1s ease;
+            border-radius: 5px;
+        }
+
+        .phase-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 10px;
+        }
+
+        .phase-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #bdbdbd;
+            transition: all 0.3s ease;
+        }
+
+        .phase-dot.active {
+            background: #3f51b5;
+            transform: scale(1.3);
+        }
+
+        .emotion-intensity {
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .intensity-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .intensity-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #e0e0e0;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .intensity-slider:hover {
+            opacity: 1;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #757575;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+            margin-top: 30px;
+        }
+
+        .restart-btn {
+            background: linear-gradient(to right, #ff9800, #ffb74d);
+            color: white;
+            margin: 20px auto;
+            display: block;
+        }
+
+        .restart-btn:hover {
+            background: linear-gradient(to right, #f57c00, #ff9800);
+        }
+
+        @media (max-width: 768px) {
+            .emotions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 Emoções Corporativas</h1>
+            <p class="subtitle">Descubra quais emoções estão influenciando as decisões na sua organização através deste jogo interativo de análise emocional.</p>
+        </header>
+        
+        <div class="game-area">
+            <!-- Indicador de Fase -->
+            <div class="phase-indicator">
+                <div class="phase-dot active" data-phase="1"></div>
+                <div class="phase-dot" data-phase="2"></div>
+                <div class="phase-dot" data-phase="3"></div>
+                <div class="phase-dot" data-phase="4"></div>
+                <div class="phase-dot" data-phase="5"></div>
+            </div>
+            
+            <!-- Barra de Progresso -->
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            
+            <!-- Fase 1: Introdução -->
+            <div class="phase active" id="phase1">
+                <div class="scenario-box">
+                    <div class="scenario-title">🎯 Bem-vindo ao Jogo das Emoções Corporativas</div>
+                    <div class="scenario-text">
+                        <p>Você assumirá o papel de um <strong>analista de clima organizacional</strong> em uma empresa fictícia chamada <strong>"Nexus Solutions"</strong>.</p>
+                        <p>Sua missão é identificar quais emoções estão influenciando as decisões corporativas em diferentes departamentos e situações.</p>
+                        <p>Ao longo de 4 cenários, você coletará dados emocionais que interferem nos processos decisórios. No final, receberá um relatório completo com suas descobertas.</p>
+                        <p><strong>Instruções:</strong> Leia cada cenário atentamente e selecione as emoções que você identifica como influenciadoras. Em seguida, avalie a intensidade de cada uma.</p>
+                    </div>
+                </div>
+                <div class="buttons">
+                    <button class="btn-secondary" onclick="restartGame()">
+                        <span class="btn-icon">🔄</span> Reiniciar
+                    </button>
+                    <button class="btn-primary" onclick="nextPhase()">
+                        Iniciar Análise <span class="btn-icon">🚀</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Fase 2: Cenário 1 - Decisão de Investimento -->
+            <div class="phase" id="phase2">
+                <div class="scenario-box">
+                    <div class="scenario-title">🏦 Cenário 1: Decisão de Grande Investimento</div>
+                    <div class="scenario-text">
+                        <p>A <strong>Nexus Solutions</strong> está considerando um investimento de R$ 5 milhões em uma nova tecnologia que promete revolucionar seu produto principal.</p>
+                        <p>O <strong>Comitê Executivo</strong> está dividido. Alguns membros estão empolgados com o potencial, outros temem os riscos. Reuniões têm sido tensas, com argumentos acalorados.</p>
+                        <p><strong>Fatores observados:</strong></p>
+                        <ul>
+                            <li>O CEO tem histórico de sucesso com investimentos ousados, mas o último grande investimento falhou</li>
+                            <li>O CFO está sob pressão dos acionistas para manter dividendos altos</li>
+                            <li>O diretor de tecnologia está pessoalmente entusiasmado com a nova tecnologia</li>
+                            <li>Há rumores de que concorrentes já estão desenvolvendo algo similar</li>
+                        </ul>
+                        <p><strong>Sua tarefa:</strong> Identifique as emoções que estão influenciando esta decisão.</p>
+                    </div>
+                </div>
+                
+                <div class="emotions-grid" id="emotionsGrid2">
+                    <!-- Emoções serão inseridas via JavaScript -->
+                </div>
+                
+                <div class="buttons">
+                    <button class="btn-secondary" onclick="prevPhase()">
+                        <span class="btn-icon">◀</span> Voltar
+                    </button>
+                    <button class="btn-primary" onclick="nextPhase()">
+                        Próximo Cenário <span class="btn-icon">▶</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Fase 3: Cenário 2 - Reestruturação Organizacional -->
+            <div class="phase" id="phase3">
+                <div class="scenario-box">
+                    <div class="scenario-title">🏢 Cenário 2: Reestruturação Organizacional</div>
+                    <div class="scenario-text">
+                        <p>A <strong>Nexus Solutions</strong> precisa reestruturar seu departamento de vendas após um trimestre de resultados abaixo do esperado.</p>
+                        <p>O plano inclui fusão de duas equipes, realocação de funcionários e possível redução de alguns cargos. A notícia vazou antes do anúncio oficial, criando um clima de incerteza e ansiedade.</p>
+                        <p><strong>Fatores observados:</strong></p>
+                        <ul>
+                            <li>O diretor de vendas está relutante em demitir colaboradores com quem trabalha há anos</li>
+                            <li>Os vendedores seniores estão preocupados com mudanças em suas comissões</li>
+                            <li>A equipe de RH está sobrecarregada com o processo e teme erros jurídicos</li>
+                            <li>Há resistência silenciosa dos gerentes intermediários que não foram adequadamente consultados</li>
+                        </ul>
+                        <p><strong>Sua tarefa:</strong> Identifique as emoções que estão influenciando esta decisão.</p>
+                    </div>
+                </div>
+                
+                <div class="emotions-grid" id="emotionsGrid3">
+                    <!-- Emoções serão inseridas via JavaScript -->
+                </div>
+                
+                <div class="buttons">
+                    <button class="btn-secondary" onclick="prevPhase()">
+                        <span class="btn-icon">◀</span> Voltar
+                    </button>
+                    <button class="btn-primary" onclick="nextPhase()">
+                        Próximo Cenário <span class="btn-icon">▶</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Fase 4: Cenário 3 - Lançamento de Novo Produto -->
+            <div class="phase" id="phase4">
+                <div class="scenario-box">
+                    <div class="scenario-title">🚀 Cenário 3: Lançamento de Novo Produto</div>
+                    <div class="scenario-text">
+                        <p>A equipe de desenvolvimento concluiu um novo produto após 18 meses de trabalho. A decisão agora é sobre o timing e a estratégia de lançamento.</p>
+                        <p>O mercado está volátil, e há divergências sobre se devem lançar imediatamente ou esperar condições mais favoráveis. A equipe de marketing está pressionando por um lançamento rápido para "capitalizar o momentum".</p>
+                        <p><strong>Fatores observados:</strong></p>
+                        <ul>
+                            <li>A equipe de desenvolvimento está emocionalmente apegada ao produto e quer vê-lo no mercado</li>
+                            <li>O diretor de marketing teme perder a "janela de oportunidade" para um concorrente</li>
+                            <li>O CEO está hesitante após o fracasso do último lançamento, que afetou o preço das ações</li>
+                            <li>Investidores estão impacientes por ver retorno sobre o investimento em P&D</li>
+                        </ul>
+                        <p><strong>Sua tarefa:</strong> Identifique as emoções que estão influenciando esta decisão.</p>
+                    </div>
+                </div>
+                
+                <div class="emotions-grid" id="emotionsGrid4">
+                    <!-- Emoções serão inseridas via JavaScript -->
+                </div>
+                
+                <div class="buttons">
+                    <button class="btn-secondary" onclick="prevPhase()">
+                        <span class="btn-icon">◀</span> Voltar
+                    </button>
+                    <button class="btn-primary" onclick="nextPhase()">
+                        Ver Resultados <span class="btn-icon">📊</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Fase 5: Resultados -->
+            <div class="phase" id="phase5">
+                <div class="results">
+                    <div class="results-title">📈 Relatório de Análise Emocional</div>
+                    <p style="text-align: center; margin-bottom: 25px; color: #555;">Com base nas suas seleções, aqui está o diagnóstico das emoções que estão influenciando as decisões na Nexus Solutions.</p>
+                    
+                    <div class="results-grid" id="resultsGrid">
+                        <!-- Resultados serão inseridos via JavaScript -->
+                    </div>
+                    
+                    <div class="scenario-box">
+                        <div class="scenario-title">💡 Recomendações para a Nexus Solutions</div>
+                        <div class="scenario-text" id="recommendations">
+                            <!-- Recomendações serão inseridas via JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <button class="btn-primary restart-btn" onclick="restartGame()">
+                        <span class="btn-icon">🔄</span> Jogar Novamente
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Jogo educativo desenvolvido para treinamento em inteligência emocional corporativa</p>
+            <p>© 2023 Nexus Solutions - Todos os direitos emocionais reservados</p>
+        </footer>
+    </div>
+
+    <script>
+        // Dados do jogo
+        const gameData = {
+            currentPhase: 1,
+            totalPhases: 5,
+            selections: {
+                phase2: [],
+                phase3: [],
+                phase4: []
+            },
+            emotions: {
+                phase2: [
+                    { id: "medo", name: "Medo", icon: "😨", description: "Receio de perdas financeiras ou fracasso", intensity: 0 },
+                    { id: "empolgação", name: "Empolgação", icon: "🤩", description: "Entusiasmo com potencial de ganhos", intensity: 0 },
+                    { id: "ansiedade", name: "Ansiedade", icon: "😰", description: "Incerteza sobre o futuro", intensity: 0 },
+                    { id: "confiança", name: "Confiança", icon: "😌", description: "Certeza baseada em experiências passadas", intensity: 0 },
+                    { id: "pressão", name: "Pressão", icon: "💪", description: "Sensação de urgência ou obrigação", intensity: 0 },
+                    { id: "cautela", name: "Cautela", icon: "🧐", description: "Prudência excessiva por receio de riscos", intensity: 0 }
+                ],
+                phase3: [
+                    { id: "insegurança", name: "Insegurança", icon: "😟", description: "Dúvida sobre capacidades ou futuro", intensity: 0 },
+                    { id: "lealdade", name: "Lealdade", icon: "🤝", description: "Compromisso emocional com colegas", intensity: 0 },
+                    { id: "ressentimento", name: "Ressentimento", icon: "😠", description: "Mágoa por não ser consultado", intensity: 0 },
+                    { id: "culpa", name: "Culpa", icon: "😞", description: "Responsabilidade por possíveis demissões", intensity: 0 },
+                    { id: "proteção", name: "Proteção", icon: "🛡️", description: "Desejo de preservar a equipe", intensity: 0 },
+                    { id: "frustração", name: "Frustração", icon: "😤", description: "Irritação com resultados insatisfatórios", intensity: 0 }
+                ],
+                phase4: [
+                    { id: "apego", name: "Apego", icon: "💝", description: "Conexão emocional com trabalho realizado", intensity: 0 },
+                    { id: "urgência", name: "Urgência", icon: "⏰", description: "Sensação de tempo se esgotando", intensity: 0 },
+                    { id: "hesitação", name: "Hesitação", icon: "🤔", description: "Dúvida após experiências negativas", intensity: 0 },
+                    { id: "impaciência", name: "Impaciência", icon: "😤", description: "Desejo por resultados imediatos", intensity: 0 },
+                    { id: "otimismo", name: "Otimismo", icon: "😊", description: "Expectativa positiva sobre resultados", intensity: 0 },
+                    { id: "preocupação", name: "Preocupação", icon: "😓", description: "Apreensão com reação do mercado", intensity: 0 }
+                ]
+            },
+            emotionImpacts: {
+                "medo": "Decisões excessivamente conservadoras, perda de oportunidades",
+                "empolgação": "Superestimação de ganhos, subestimação de riscos",
+                "ansiedade": "Paralisia decisória, adiamento de escolhas importantes",
+                "confiança": "Decisões assertivas mas possivelmente arrogantes",
+                "pressão": "Decisões precipitadas para aliviar tensão",
+                "cautela": "Análise excessiva, lentidão na tomada de decisão",
+                "insegurança": "Busca excessiva por validação, delegação inadequada",
+                "lealdade": "Manutenção de situações subótimas para preservar relações",
+                "ressentimento": "Decisões vingativas ou de exclusão",
+                "culpa": "Compensações inadequadas, evitamento de escolhas difíceis",
+                "proteção": "Foco excessivo em segurança em detrimento de crescimento",
+                "frustração": "Decisões impulsivas para mudar situação rapidamente",
+                "apego": "Investimento contínuo em projetos inviáveis",
+                "urgência": "Falta de análise adequada, decisões incompletas",
+                "hesitação": "Oportunidades perdidas por falta de ação",
+                "impaciência": "Pouca consideração por consequências de longo prazo",
+                "otimismo": "Subestimação de desafios, planejamento irrealista",
+                "preocupação": "Foco excessivo em possíveis problemas"
+            }
+        };
+
+        // Inicializar o jogo
+        function initGame() {
+            updateProgressBar();
+            renderEmotionsForPhase(2);
+            renderEmotionsForPhase(3);
+            renderEmotionsForPhase(4);
+        }
+
+        // Renderizar emoções para uma fase específica
+        function renderEmotionsForPhase(phaseNumber) {
+            const grid = document.getElementById(`emotionsGrid${phaseNumber}`);
+            if (!grid) return;
+            
+            grid.innerHTML = '';
+            const phaseKey = `phase${phaseNumber}`;
+            const emotions = gameData.emotions[phaseKey];
+            
+            emotions.forEach(emotion => {
+                const isSelected = gameData.selections[phaseKey].includes(emotion.id);
+                
+                const emotionCard = document.createElement('div');
+                emotionCard.className = `emotion-card ${isSelected ? 'selected' : ''}`;
+                emotionCard.dataset.emotionId = emotion.id;
+                emotionCard.dataset.phase = phaseKey;
+                
+                emotionCard.innerHTML = `
+                    <div class="emotion-icon">${emotion.icon}</div>
+                    <div class="emotion-name">${emotion.name}</div>
+                    <div class="emotion-description">${emotion.description}</div>
+                    ${isSelected ? `
+                    <div class="emotion-intensity">
+                        <div class="intensity-label">
+                            <span>Intensidade:</span>
+                            <span id="intensityValue-${phaseKey}-${emotion.id}">${emotion.intensity}</span>
+                        </div>
+                        <input type="range" min="1" max="10" value="${emotion.intensity || 5}" 
+                               class="intensity-slider" 
+                               data-phase="${phaseKey}" 
+                               data-emotion="${emotion.id}"
+                               oninput="updateIntensity('${phaseKey}', '${emotion.id}', this.value)">
+                    </div>
+                    ` : ''}
+                `;
+                
+                emotionCard.onclick = () => toggleEmotionSelection(phaseKey, emotion.id);
+                grid.appendChild(emotionCard);
+            });
+        }
+
+        // Alternar seleção de emoção
+        function toggleEmotionSelection(phaseKey, emotionId) {
+            const index = gameData.selections[phaseKey].indexOf(emotionId);
+            
+            if (index === -1) {
+                // Adicionar emoção
+                gameData.selections[phaseKey].push(emotionId);
+                // Definir intensidade padrão se não existir
+                const emotion = gameData.emotions[phaseKey].find(e => e.id === emotionId);
+                if (emotion && emotion.intensity === 0) {
+                    emotion.intensity = 5;
+                }
+            } else {
+                // Remover emoção
+                gameData.selections[phaseKey].splice(index, 1);
+            }
+            
+            renderEmotionsForPhase(parseInt(phaseKey.replace('phase', '')));
+        }
+
+        // Atualizar intensidade da emoção
+        function updateIntensity(phaseKey, emotionId, value) {
+            const emotion = gameData.emotions[phaseKey].find(e => e.id === emotionId);
+            if (emotion) {
+                emotion.intensity = parseInt(value);
+                document.getElementById(`intensityValue-${phaseKey}-${emotionId}`).textContent = value;
+            }
+        }
+
+        // Avançar para próxima fase
+        function nextPhase() {
+            if (gameData.currentPhase < gameData.totalPhases) {
+                document.getElementById(`phase${gameData.currentPhase}`).classList.remove('active');
+                gameData.currentPhase++;
+                document.getElementById(`phase${gameData.currentPhase}`).classList.add('active');
+                updateProgressBar();
+                updatePhaseIndicator();
+                
+                // Se for a fase de resultados, gerar relatório
+                if (gameData.currentPhase === 5) {
+                    generateResults();
+                }
+            }
+        }
+
+        // Voltar para fase anterior
+        function prevPhase() {
+            if (gameData.currentPhase > 1) {
+                document.getElementById(`phase${gameData.currentPhase}`).classList.remove('active');
+                gameData.currentPhase--;
+                document.getElementById(`phase${gameData.currentPhase}`).classList.add('active');
+                updateProgressBar();
+                updatePhaseIndicator();
+            }
+        }
+
+        // Atualizar barra de progresso
+        function updateProgressBar() {
+            const progress = ((gameData.currentPhase - 1) / (gameData.totalPhases - 1)) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+        }
+
+        // Atualizar indicador de fase
+        function updatePhaseIndicator() {
+            document.querySelectorAll('.phase-dot').forEach(dot => {
+                const dotPhase = parseInt(dot.dataset.phase);
+                dot.classList.toggle('active', dotPhase === gameData.currentPhase);
+            });
+        }
+
+        // Gerar resultados
+        function generateResults() {
+            const resultsGrid = document.getElementById('resultsGrid');
+            const recommendations = document.getElementById('recommendations');
+            
+            // Calcular emoções mais frequentes
+            const emotionFrequency = {};
+            const emotionIntensity = {};
+            
+            // Analisar seleções de todas as fases
+            for (const phaseKey in gameData.selections) {
+                gameData.selections[phaseKey].forEach(emotionId => {
+                    emotionFrequency[emotionId] = (emotionFrequency[emotionId] || 0) + 1;
+                    
+                    // Encontrar a emoção para obter intensidade
+                    const emotion = gameData.emotions[phaseKey].find(e => e.id === emotionId);
+                    if (emotion) {
+                        emotionIntensity[emotionId] = Math.max(
+                            emotionIntensity[emotionId] || 0, 
+                            emotion.intensity
+                        );
+                    }
+                });
+            }
+            
+            // Ordenar emoções por frequência e intensidade
+            const sortedEmotions = Object.keys(emotionFrequency)
+                .map(emotionId => ({
+                    id: emotionId,
+                    name: getEmotionNameById(emotionId),
+                    icon: getEmotionIconById(emotionId),
+                    frequency: emotionFrequency[emotionId],
+                    intensity: emotionIntensity[emotionId] || 5,
+                    impact: gameData.emotionImpacts[emotionId] || "Impacto não especificado"
+                }))
+                .sort((a, b) => {
+                    // Ordenar primeiro por frequência, depois por intensidade
+                    if (b.frequency !== a.frequency) return b.frequency - a.frequency;
+                    return b.intensity - a.intensity;
+                });
+            
+            // Exibir top 6 emoções
+            resultsGrid.innerHTML = '';
+            const topEmotions = sortedEmotions.slice(0, 6);
+            
+            if (topEmotions.length === 0) {
+                resultsGrid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Nenhuma emoção foi selecionada. Tente novamente.</p>';
+                recommendations.innerHTML = '<p>Sem dados suficientes para gerar recomendações. Por favor, jogue novamente e selecione as emoções que identifica em cada cenário.</p>';
+                return;
+            }
+            
+            topEmotions.forEach(emotion => {
+                const resultCard = document.createElement('div');
+                resultCard.className = 'result-card';
+                
+                // Determinar nível de urgência
+                let urgencyLevel = "Médio";
+                let urgencyColor = "#ff9800";
+                
+                if (emotion.frequency >= 3 || emotion.intensity >= 8) {
+                    urgencyLevel = "Alto";
+                    urgencyColor = "#f44336";
+                } else if (emotion.frequency === 1 && emotion.intensity <= 5) {
+                    urgencyLevel = "Baixo";
+                    urgencyColor = "#4caf50";
+                }
+                
+                resultCard.innerHTML = `
+                    <div class="result-emotion">
+                        <div style="font-size: 2rem;">${emotion.icon}</div>
+                        <div>
+                            <div class="result-emotion-name">${emotion.name}</div>
+                            <div>Frequência: ${emotion.frequency} cenário(s) | Intensidade: ${emotion.intensity}/10</div>
+                            <div style="color: ${urgencyColor}; font-weight: bold;">Urgência: ${urgencyLevel}</div>
+                        </div>
+                    </div>
+                    <div class="result-impact">
+                        <strong>Impacto nas decisões:</strong> ${emotion.impact}
+                    </div>
+                `;
+                
+                resultsGrid.appendChild(resultCard);
+            });
+            
+            // Gerar recomendações baseadas nas emoções mais frequentes
+            generateRecommendations(topEmotions, recommendations);
+        }
+
+        // Obter nome da emoção por ID
+        function getEmotionNameById(emotionId) {
+            // Buscar em todas as fases
+            for (const phaseKey in gameData.emotions) {
+                const emotion = gameData.emotions[phaseKey].find(e => e.id === emotionId);
+                if (emotion) return emotion.name;
+            }
+            return emotionId.charAt(0).toUpperCase() + emotionId.slice(1);
+        }
+
+        // Obter ícone da emoção por ID
+        function getEmotionIconById(emotionId) {
+            // Buscar em todas as fases
+            for (const phaseKey in gameData.emotions) {
+                const emotion = gameData.emotions[phaseKey].find(e => e.id === emotionId);
+                if (emotion) return emotion.icon;
+            }
+            return "❓";
+        }
+
+        // Gerar recomendações
+        function generateRecommendations(topEmotions, container) {
+            let recommendationsHTML = '<p><strong>Com base na sua análise, recomendamos à Nexus Solutions:</strong></p><ul>';
+            
+            topEmotions.forEach(emotion => {
+                let recommendation = "";
+                
+                switch(emotion.id) {
+                    case "medo":
+                    case "ansiedade":
+                    case "preocupação":
+                        recommendation = "Implementar processos de análise de riscos mais estruturados e baseados em dados, reduzindo a influência do medo subjetivo.";
+                        break;
+                    case "empolgação":
+                    case "otimismo":
+                        recommendation = "Estabelecer um 'advogado do diabo' sistemático em reuniões decisórias para balancear o otimismo excessivo.";
+                        break;
+                    case "pressão":
+                    case "urgência":
+                    case "impaciência":
+                        recommendation = "Criar protocolos de 'pausa reflexiva' obrigatória antes de decisões importantes sob pressão temporal.";
+                        break;
+                    case "cautela":
+                    case "hesitação":
+                        recommendation = "Definir prazos máximos para análise e implementar processos de decisão por etapas para evitar paralisia.";
+                        break;
+                    case "insegurança":
+                        recommendation = "Desenvolver programas de mentoria e capacitação decisória para gestores, aumentando a autoconfiança baseada em competência.";
+                        break;
+                    case "lealdade":
+                    case "apego":
+                        recommendation = "Implementar avaliações periódicas de desempenho e viabilidade objetivas, desvinculadas de relações pessoais.";
+                        break;
+                    case "ressentimento":
+                    case "frustração":
+                        recommendation = "Estabelecer canais formais de escuta e participação nas decisões que afetam as equipes, reduzindo sentimentos de exclusão.";
+                        break;
+                    case "culpa":
+                        recommendation = "Desenvolver uma cultura organizacional que distingua entre responsabilidade profissional e culpa pessoal.";
+                        break;
+                    case "proteção":
+                        recommendation = "Criar métricas balanceadas que avaliem tanto a proteção dos recursos quanto a inovação e crescimento.";
+                        break;
+                    case "confiança":
+                        recommendation = "Implementar sistemas de checagem de realidade (reality checks) para decisões baseadas excessivamente em confiança intuitiva.";
+                        break;
+                    default:
+                        recommendation = "Desenvolver maior consciência emocional coletiva sobre como esta emoção influencia as decisões organizacionais.";
+                }
+                
+                recommendationsHTML += `<li><strong>${emotion.name}:</strong> ${recommendation}</li>`;
+            });
+            
+            recommendationsHTML += '</ul>';
+            recommendationsHTML += '<p><strong>Ação imediata sugerida:</strong> Realizar um workshop de regulação emocional para o comitê executivo, focando nas 3 emoções mais frequentes identificadas.</p>';
+            
+            container.innerHTML = recommendationsHTML;
+        }
+
+        // Reiniciar o jogo
+        function restartGame() {
+            // Resetar seleções
+            gameData.selections = {
+                phase2: [],
+                phase3: [],
+                phase4: []
+            };
+            
+            // Resetar intensidades
+            for (const phaseKey in gameData.emotions) {
+                gameData.emotions[phaseKey].forEach(emotion => {
+                    emotion.intensity = 0;
+                });
+            }
+            
+            // Voltar para fase 1
+            document.getElementById(`phase${gameData.currentPhase}`).classList.remove('active');
+            gameData.currentPhase = 1;
+            document.getElementById(`phase${gameData.currentPhase}`).classList.add('active');
+            
+            // Atualizar interface
+            updateProgressBar();
+            updatePhaseIndicator();
+            renderEmotionsForPhase(2);
+            renderEmotionsForPhase(3);
+            renderEmotionsForPhase(4);
+        }
+
+        // Inicializar o jogo quando a página carregar
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
